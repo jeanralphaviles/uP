@@ -1,0 +1,35 @@
+BEGIN PROGRAM:
+  IF PORT_F_6 is clear
+  THEN
+    OUTPUT(PORT_E, 0x03)
+    WHILE PORT_E_6 is clear
+    DO
+      DELAY(240ms)
+      ROTATE_L(PORT_E, WRAP=TRUE)
+    END WHILE
+  ENDIF
+  IF PORT_F_6 is not clear
+  THEN
+    OUTPUT(PORT_E, 0b11100111)
+    * Simple algorithm for part C
+    * E = 0xE7 and have a variable x := 0x24 and while
+    * PORT F is not clear then...
+    * xor(PORT_E, x)
+    * swap nibles of X, so 0x24 => 0x42, 0x42 => 0x24
+    * xor(PORT_E, x)
+    * repeat
+    x := 0x24
+    DELAY(420ms)
+    WHILE PORT_F_6 is not clear
+      XOR(PORT_E, x)
+      DELAY(420ms)
+      IF PORT_F_6 is not clear
+      THEN
+        BREAK
+      ENDIF
+      SWAP_NIBBLES(x)
+      XOR(PORT_E, x)
+      DELAY(420ms)
+    END WHILE
+  ENDIF
+END PROGRAM.
