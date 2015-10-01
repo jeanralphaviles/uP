@@ -1,0 +1,10 @@
+program x:
+begin
+loop forever
+  x := input(0x8000) * Read input
+  for i := 0 to 7
+    output(x << i, 0x8000) * Shift bits
+    sleep(2000) * Sleep 2000ms
+  done
+pool
+end x.
