@@ -1,0 +1,23 @@
+# Configure Chip Selects
+def main():
+  write32k(0xAA)
+  check32k(0xAA)
+  write32k(0x55)
+  check32k(0x55)
+
+write32k(value):
+  for Y in range(0x472000, 0x480000):
+    *Y = value
+
+check32k(value):
+  count = 0
+  X = 0x2000
+  for Y in range(0x472000, 0x480000):
+    tmp = *Y
+    if tmp is not value:
+      *(X++) = Y_L
+      *(X++) = Y_H
+      *(X++) = RAMPY
+      count = count + 1
+      if count is 100:
+        break

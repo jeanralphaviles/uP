@@ -1,0 +1,164 @@
+/*
+* Jean-Ralph Aviles 
+* Lab 3 Program Sram Check
+* 10/14/2015
+* TA Khaled
+*/
+
+.include "ATxmega128A1Udef.inc"
+
+.equ START = 0x8000  ;Start Address for IO
+.equ SRAM_STARTA = 0x472000  ;Start Address for SRAM
+.equ KEYTAB_WIDTH = 4  ;Width for Keypad Table
+.equ KEYTAB_HEIGHT = 4  ;Height for Keypad Table
+
+.org 0x100
+  rjmp CONFIGURE
+
+CONFIGURE:
+.org 0x200
+  ;Initialize Stack
+  ldi r16, 0xFF  ;Lower Byte of Stack Pointer
+  out CPU_SPL, r16  ;Set lower byte
+  ldi r16, 0x3F  ;Upper byte of Stack Pointer
+  out CPU_SPH, r16  ;Set Upper byte
+  ldi r16, 0xF0  ;PortF pin dir, upper bits output, lower input
+  sts PORTF_DIR, r16  ;""
+  ldi r16, 0x0F  ;Set mask for pins to configure 3:0
+  sts PORTCFG_MPCMASK, r16  ;Load mask into MPCMASK register.
+  ldi r16, 0x10  ;Configure input pin pull up resistors.
+  sts PORTF_PIN0CTRL, r16  ;Pin0 pullup Applies to 3:0
+
+  ;Mem mapped I/O
+  ldi R16, 0b110111  ;set /WE, /RE, /CS0, /CS1 to Output      
+  sts PORTH_DIR, R16
+  ldi R16, 0b110011  ;set /RE, /WE, /CS0, /CS1 to default of H
+  sts PORTH_OUTSET, R16
+  ldi R16, 0xFF  ;set all PORTJ pins (D0-D7) to be outputs.
+  sts PORTJ_DIR, R16  ;As required in the data sheet.
+  ldi R16, 0xFF  ;set all PORTK pins (A0-A15) to be outputs.
+  sts PORTK_DIR, R16  ;As required in the data sheet.
+  ldi R16, 0x01  ;Store 0x01 in EBI_CTRL register to select 3
+                 ;port EBI(H, J, K)  mode and SRAM ALE1 mode
+  sts EBI_CTRL, R16
+
+  ;Switches and Leds /CS0
+  ldi r16, 0b0010101     ;Set CTRL A to 8K address size
+  sts EBI_CS0_CTRLA, r16  ;(0b00101) and SRAM Mode (0b01)
+               ;pg 335 8331
+  ldi ZL, LOW(EBI_CS0_BASEADDR) ;Load Z with BASEADDR
+  ldi ZH, HIGH(EBI_CS0_BASEADDR)  ;We will load the upper 12
+  ldi r16, byte2(START)  ;bits of the START address
+  st Z+, r16  ;into BASEADDR register.
+  ldi r16, byte3(START)
+  st Z, r16
+
+  ;32K SRAM
+  ldi r16, 0b0100001    ;Set CTRL A to 64K address size
+  sts EBI_CS3_CTRLA, r16  ;(0b01000) and SRAM Mode (0b01)
+  ldi ZL, LOW(EBI_CS1_BASEADDR)  ;Load Z with BASEADDR
+  ldi ZH, HIGH(EBI_CS1_BASEADDR)  ;We will load the upper 12
+  ldi r16, 0x00  ;bits of the Start address
+  st Z+, r16  ;into BASEADDR register.
+  ldi r16, 0x47
+  st Z, r16
+  
+  ldi r16, byte3(START)  ;Set third byte of X
+  sts CPU_RAMPX, r16
+  ldi XL, LOW(START)  ;Load X with START address
+  ldi XH, HIGH(START)
+
+  ldi r16, 0x0  ;Zero out the LED
+  st X, r16
+
+  ldi YL, LOW(SRAM_STARTA)  ;Point Y to SRAM
+  ldi YH, HIGH(SRAM_STARTA)
+  ldi r16, byte3(SRAM_STARTA)
+  sts CPU_RAMPY, r16
+  rjmp MAIN
+
+MAIN:
+  ldi r16, 0xAA  ;Load 0xAA into r16
+  rcall Write32k  ;Write32K to SRAM
+  rcall Check32k  ;Check32k SRAM
+  ldi r16, 0x55  ;Load 0x55 into r16
+  rcall Write32k  ;Write32k to SRAM
+  rcall Check32k  ;Check32K SRAM
+
+DONE:
+  rjmp DONE
+
+Write32k:
+;Writes r16 to all 32K addresses in SRAM
+  push r17  ;Save r17
+  push YL  ;Save YL
+  push YH  ;Save YH
+  lds r17, CPU_RAMPY  ;Load r17 with RampY
+  push r17  ;Save RampY
+  ldi YL, byte1(SRAM_STARTA)  ;PointY to SRAM
+  ldi Yh, byte2(SRAM_STARTA)
+  ldi r17, byte3(SRAM_STARTA)
+  sts CPU_RAMPY, r17
+Write32kLOOP:
+  cpi YH, 0xA0 ;Compare YH with 0xA0
+  breq Write32kLOOPEND  ;If equal, memory is done
+  st Y+, r16  ;Else store r16 at Y and increment
+  rjmp Write32kLOOP  ;Loop
+Write32kLOOPEND:
+  pop r17    ;Restore RAMPY
+  sts CPU_RAMPY, r17
+  pop YH  ;Restore YH
+  pop YL  ;Restore YL
+  pop r17  ;Restore r17
+  ret
+
+Check32k:
+;Checks r16 to all 32K addresses in SRAM
+  push r18  ;Save r18
+  push r17  ;Save r17
+  push YL  ;Save YL
+  push YH  ;Save YH
+  lds r17, CPU_RAMPY  ;Load r17 with RampY
+  push r17  ;Save RampY
+  push XL  ;Save XL
+  push XH  ;Save XH
+  lds r17, CPU_RAMPX  ;Load r17 with RampX
+  push r17  ;Save RampX
+
+  ldi XL, byte1(0x2000)  ;PointX to 0x2000
+  ldi XH, byte2(0x2000)
+  ldi r17, byte3(0x2000)
+  sts CPU_RAMPX, r17
+
+  ldi YL, byte1(SRAM_STARTA)  ;PointY to SRAM
+  ldi Yh, byte2(SRAM_STARTA)
+  ldi r17, byte3(SRAM_STARTA)
+  sts CPU_RAMPY, r17
+  ldi r18, 0x0  ;Set r13 to 0
+Check32kLOOP:
+  cpi YH, 0xA0  ;Compare YH with 0xA0
+  breq Check32kLOOPEND  ;If equal, memory is done
+  ld r17, Y+  ;Retrieve data at Y
+  cp r16, r17  ;Compare r17 with r16
+  brne Check32kLOOPERROR  ;If != Write Error
+  rjmp Check32kLOOP  ;Loop
+CHECK32kLOOPERROR:
+  st X+, YL  ;Store Lower Address of Y
+  st X+, YH  ;Store Higher Address of Y
+  inc r18  ;Increment r18
+  cpi r18, 100  ;Compare r18 with 100
+  breq Check32kLOOPEND  ;If equal then exit
+  rjmp Check32kLoop  ;Else loop
+Check32kLOOPEND:
+  pop r17  ;Restore RampX
+  sts CPU_RAMPX, r17
+  pop XH  ;Restore XH
+  pop XL  ;Restore XL
+  pop r17  ;Restore RAMPY
+  sts CPU_RAMPY, r17
+  pop YH  ;Restore YH
+  pop YL  ;Restore YL
+  pop r17  ;Restore r17
+  pop r18  ;Restore r18
+  ret
+
