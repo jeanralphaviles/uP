@@ -1,0 +1,12 @@
+def main():
+	x = 0xC3
+	while True:
+		output(led, x)
+		x = ~x
+
+def USARTD0_RXC_isr():
+	x = read(serial)
+	output(serial, x)
+
+if __name__ == "__main__":
+	main()

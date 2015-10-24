@@ -1,0 +1,14 @@
+def main():
+    InitLeds()
+    EnableInterrupts()
+    while True:
+        pass  # Do nothing forever
+
+def Counter_Interrupt():
+    sleep(1ms)
+    if read_pin() is not 0:
+        return
+    LED = LED + 1
+    clear_interrupt_flag()
+    return
+

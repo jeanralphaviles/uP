@@ -1,0 +1,5 @@
+def in_char():
+  while USARTD0_STATUS & 0x80 is 0:
+    pass
+  c = read_char()
+  return c

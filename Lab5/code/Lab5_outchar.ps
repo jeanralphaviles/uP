@@ -1,0 +1,5 @@
+def out_char(c):
+  while USARTD0_STATUS & 0x10 is 0:
+    pass
+  output(c)
+  return
