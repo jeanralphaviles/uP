@@ -1,0 +1,95 @@
+cursor_pos = 0
+
+def init():
+  delay(40)
+  lcd_write_cmd(0b111100)
+  delay(40)
+  lcd_write_cmd(0b111100)
+  lcd_cmd(0b1111)
+  lcd_on = True
+  lcd_cmd(0b110)
+  lcd_clear()
+
+def lcd_write_c(c):
+  if c is '\n':
+    lcd_next_line()
+  else:
+    wait_lcd()
+    mem_write(LCD_DATA, c)
+    if cursor_pos is 16:
+      cursor_pos = 40
+      lcd_cmd(0x80 | cursor_pos)
+    elif cursor_pos is 56
+      cursor_pos = 0
+      lcd_cmd(0x80)
+
+def lcd_write_s(x):
+  for c in x:
+    lcd_write_c(c)
+
+def lcd_cmd(cmd):
+  wait_lcd()
+  mem_write(LCD_CMD, cmd)
+
+def lcd_clear():
+  lcd_cmd(1)
+  cursor_pos = 0
+
+def lcd_busy():
+  return mem_read(LCD_CMD) & 0x80 is not 0
+
+def wait_lcd():
+  while lcd_busy:
+    pass
+
+def lcd_reset_cursor():
+  lcd_cmd(0b10)
+
+def lcd_next_line():
+  if cursor_pos < 40:
+    cursor_pos = 40
+    lcd_cmd(0x80 | cursor_pos)
+  else:
+    cursor_pos = 0
+    lcd_cmd(0x80)
+
+def lcd_hpos():
+  if cursor_pos < 16:
+    return cursor_pos
+  else:
+    return cursor_pos - 40
+
+def lcd_vpos():
+  if cursor_pos < 16:
+    return 0
+  return 1
+
+def set_pos(h, v):
+  if v is 0:
+    cursor_pos = h
+  else:
+    cursor_pos = h + 40
+  lcd_cmd(0x80 | cursor_pos)
+
+def toggle_lcd():
+  lcd_on ^= 1
+  lcd_cmd(0b1111 ^ (lcd_on << 2))
+
+def lcd_move_cursor(dir):
+  switch (dir):
+    case LEFT:
+      if lcd_vpos() is 1 && lcd_hpos() is 0:
+        set_pos(15, 0)
+      elif lcd_hpos() != 0:
+        set_pos(lcd_hpos() - 1, lcd_vpos())
+    case RIGHT:
+      if lcd_vpos() is 0 && lcd_hpos() is 15:
+        set_pos(0, 1)
+      elif lcd_hpos() != 15:
+        set_pos(lcd_hpos() + 1, lcd_vpos())
+    case UP:
+      if lcd_vpos() is 1:
+        set_pos(lcd_hpos(), 0)
+    case DOWN:
+      if lcd_vpos() is 0:
+        set_pos(lcd_hpos(), 1)

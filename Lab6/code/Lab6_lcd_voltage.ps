@@ -1,0 +1,7 @@
+def main():
+  init()
+  while True:
+    lcd_clear()
+    x = str(convert(read_adc()))
+    lcd_write("%s V (%s)" % (x, hex(x)))
+    delay(500)

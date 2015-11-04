@@ -1,0 +1,21 @@
+def init():
+  ADCB_CTRLA = 0x01
+  PORTA_DIRCLR = 0xFF
+  PORTB_DIRCLR = 0x08
+  ADCB_CTRLB = 0x0C
+  ADCB_REFCLR = 0x30
+  ADCB_PRESCALER = 0x07
+  ADCB_CH0_CTRL = 0x81
+  ADCB_CH0_MUXCTRL = 0x20
+
+def read_adc():
+  ADCB_CTRLA |= 0x4
+  ADCB_CH0_CTRL = 0x81
+  while ADCB_CH0_INTFLAGS & 0x01 is 0:
+    pass
+  ADCB_CH0_INTFLAGS = 0x01
+  return ADCB_CH0_RES
+
+def convert(reading):
+  return 1.875 * reading - 20
+

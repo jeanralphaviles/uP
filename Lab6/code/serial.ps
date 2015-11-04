@@ -1,0 +1,27 @@
+LAST_SERIAL = '\0'
+BSCALE = -7
+BSEL = 1539
+
+def init():
+	PORTD_DIRSET = 0x08
+	PORTD_OUTSET = 0x08
+	PORTD_DIRCLR = 0x04
+	PORTQ_DIRSET = 0x0A
+	PORTQ_OUTCLR = 0x0A
+	USARTD0_CTRLB = 0x18
+	USARTD0_CTRLC = 0x03
+	USARTD0_BAUDCTRLA = BSEL & 0xFF
+	USARTD0_BAUDCTRLB = (((BSCALE << 4) & 0xF0) | ((BSEL >> 8) & 0x0F))
+	USARTD0_CTRLA = 0x30
+
+def serial_send(data):
+	while USARTD0_STATUS & 0x20 is 0:
+		pass
+	USARTD0_DATA = data
+
+def serial_send_s(string):
+	for c in string:
+		serial_send(c)
+
+SERIAL_RX_ISR():
+	LAST_SERIAL = USARTD0_DATA

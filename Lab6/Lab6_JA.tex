@@ -1,0 +1,89 @@
+\documentclass[letterpaper, 12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
+\graphicspath{{images/}{../Template/images/}}
+\lstset{language=C,basicstyle=\ttfamily,keywordstyle=\color{blue}\ttfamily,stringstyle=\color{red}\ttfamily,commentstyle=\color{green}\ttfamily,morecomment=[l][\color{magenta}]{\#},tabsize=2,showstringspaces=false,frame=single}
+
+\newcommand{\hwnumber}{Lab 6}
+\newcommand{\duedate}{November 3rd, 2015}
+
+\newcommand{\capper}{\begin{flushright}Aviles, Jean-Ralph \\ EEL3744 \\ Section 1539 \\ \duedate{} \\ \hwnumber{}\end{flushright}}
+
+\begin{document}
+\capper{}
+\section*{Questions}
+\begin {enumerate}
+    \item If you were working on another microcontroller and you
+      wanted to add an 8-bit LCD to it, what is the minimum
+      amount of signals required from the microcontroller to get
+      it working? \\
+      \hspace*{8pt} According to the manual for the LCD we need 8 data pins, an enable, and a RS to get the LCD working.
+    \item In this lab our reference range is ideally from 0V to 5V. If
+      the range was 0 to 2.0625V (a possible internal reference)
+      and 12-bit unsigned mode was used, what is the resolution
+      (volts/bit) and what is the digital value for a voltage of 0.37
+      V. \\
+      \hspace*{8pt} 12 bits yields 4096 possible values, so with a range of 2.0625V our resolution is \begin{equation} \frac{2.0625}{12} = 0.17\frac{V}{bit} \end{equation}
+      The digital value for 0.37V would be\dots \begin{equation} \frac{0.37V}{2.0625V}\times4096 = 734 \end{equation}
+    \item Assume you wanted a voltage reference range from 1 V to
+      3 V, with a signed 12-bit ADC. What are the voltages if
+      the ADC output is 0xA42 and 0xD37?
+      \begin{equation} 0xA42 = 2626. V = \frac{2626}{4096}\times2V + 1V = 2.28V  \end{equation}
+      \begin{equation} 0xD37 = 3383. V = \frac{3383}{4096}\times2V + 1V = 2.65V \end{equation}
+    \item What is the difference in conversion ranges between 12-
+      bit unsigned and signed conversion modes? List both
+      ranges. \\
+      $ Unsigned: 0 - 2^{12}-1 = 0 - 4095. Signed -2^{-11} - 2^{11}-1 $
+\end{enumerate}
+\section*{Problems Encountered}
+\begin{enumerate}
+  \item I could not poll the buzy flag on the LCD screen. I ended up just using a flat delay because of this. Check out lcd\_busy() in lcd.h.
+\end{enumerate}
+\section*{Future Work/Applications}
+Writing to the LCD screen can give us --the user-- easier access to what is going on with the microcontroller and allows us to write more user friendly programs in the future.
+\section*{Appendix}
+\subsection*{Scratch Work}
+\begin{center}
+  \includegraphics[scale=0.1]{scratch_work}
+\end{center}
+\section*{Pseudocode/Flowcharts}
+\subsection*{Lab6\_lcd\_keypad.ps}
+\lstinputlisting[language=Python]{code/Lab6_lcd_keypad.ps}
+\subsection*{Lab6\_lcd\_name.ps}
+\lstinputlisting[language=Python]{code/Lab6_lcd_name.ps}
+\subsection*{Lab6\_lcd\_voltage.ps}
+\lstinputlisting[language=Python]{code/Lab6_lcd_voltage.ps}
+\subsection*{adc.h}
+\lstinputlisting[language=Python]{code/adc.ps}
+\subsection*{helpers.h}
+\lstinputlisting[language=Python]{code/helpers.ps}
+\subsection*{keypad.h}
+\lstinputlisting[language=Python]{code/keypad.ps}
+\subsection*{lcd.h}
+\lstinputlisting[language=Python]{code/lcd.ps}
+\subsection*{serial.h}
+\lstinputlisting[language=Python]{code/serial.ps}
+\section*{Programs}
+\subsection*{Part A}
+\subsubsection*{LCD Name}
+\lstinputlisting{code/Lab6_lcd_name.c}
+\subsection*{Part B}
+\subsubsection*{LCD Voltage}
+\lstinputlisting{code/Lab6_lcd_voltage.c}
+\subsection*{Part C}
+\subsubsection*{LCD Keypad}
+\lstinputlisting{code/Lab6_lcd_keypad.c}
+\subsection*{Headers}
+\subsubsection*{adc.h}
+\lstinputlisting{code/adc.h}
+\subsubsection*{helpers.h}
+\lstinputlisting{code/helpers.h}
+\subsubsection*{keypad.h}
+\lstinputlisting{code/keypad.h}
+\subsubsection*{lcd.h}
+\lstinputlisting{code/lcd.h}
+\subsubsection*{serial.h}
+\lstinputlisting{code/serial.h}
+\end{document}

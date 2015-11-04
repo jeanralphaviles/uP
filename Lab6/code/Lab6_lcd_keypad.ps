@@ -1,0 +1,37 @@
+LAST_KEY = '\0'
+LAST_SERIAL = '\0'
+
+def main():
+  init()
+  switch (LAST_KEY):
+    case '0':
+    case '1':
+      lcd_write("JR  Aviles")
+      sleep()
+    case '2':
+    case '3':
+      lcd_clear()
+      sleep()
+    case '4':
+    case '5':
+      toggle_lcd()
+      sleep()
+    case '6':
+    case '7':
+      lcd_clear()
+      lcd_write("May the Schwartz\nBe with you!")
+      sleep()
+    case '*':
+    case '#':
+      while LAST_SERIAL == '*' or LAST_SERIAL == '#':
+        x = str(convert(adc_value()))
+        lcd_write("%s V (%s)" % (x, hex(x)))
+        delay(500)
+    default:
+      sleep()
+
+def Serial_RX_ISR():
+  LAST_SERIAL = serial_data
+
+def Keydown_ISR():
+  LAST_KEY = read_key()

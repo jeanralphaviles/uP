@@ -1,0 +1,19 @@
+def delay_ms(ms):
+  for i in range(0, ms):
+    for j in range(0, 390):
+      pass
+
+def uint_string(x):
+  return str(x)
+
+def init():
+  PORTH_DIR = 0b110111
+  PORTH_OUTSET = 0b11011
+  PORTJ_DIR = 0xFF
+  PORTK_DIR = 0xFF
+  EBI_CTRL = 0x01
+  EBI_CS0_CTRLA = 0b0010101
+  EBI_CS0_BASEADDR = 0x8000
+  EBI_CS1_CTRLA = 0b100001
+  EBI_CS1_BASEADDR = 0x470000
+
