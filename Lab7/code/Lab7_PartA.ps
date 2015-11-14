@@ -1,0 +1,9 @@
+def main():
+    init()
+    init_speaker()
+    set_frequency(1760)
+    while True:
+        if read_switches() & 0x01:
+            enable_speaker()
+        else:
+            disable_speaker()

@@ -1,0 +1,32 @@
+KEYTAB = [
+	['1', '2', '3', 'A'],
+	['4', '5', '6', 'B'],
+	['7', '8', '9', 'C'],
+	['*', '0', '#', 'D']
+]
+
+def init():
+	PORTF_DIR = 0xF0;
+	PORTCFG_MPCMASK = 0x0F;
+	PORTF_PIN0CTRL = 0x11;
+	PORTF_INTCTRL = 0x03;
+	PORTF_INT0MASK = 0x0F;
+	PORTF_OUT = 0xF0;
+
+char read_keypad(void) {
+	for i in range(0, 4):
+		PORTF_OUT = (0b0001 << i) << 4
+		for j in range(0, 4):
+			if PORTF_IN & (0b0001 << j) is not 0:
+					return KEYTAB[i][j];
+	return 'F';
+}
+
+ISR(PORTF_INT0_vect) {
+	delay_ms(1)
+	tmp = read_keypad();
+	if tmp is not 'F':
+		last_key = tmp;
+	PORTF_INTFLAGS |= 0x01;
+}
+

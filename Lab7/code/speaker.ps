@@ -1,0 +1,20 @@
+def init_speaker():
+    PORTE_DIRSET = 0x08 # PIN3 Output
+    TCE0_CTRLA = 0x01 # Prescaler = 1
+    TCE0_CTRLD = 0x80 # Restart Waveform every Period
+    TCE0_CTRLB = 0x01 # Waveform Generation
+
+def play_note(note, duration):
+    set_frequency(note)
+    with speaker as s:
+        # With statement automatically enables & disables speaker
+        delay(duration)
+       
+def set_frequency(freq):
+    TCE0_CCA = 1000000//freq - 1
+
+def enable_speaker():
+    TCE0_CTRLB |= 0x80
+
+def disable_speaker():
+    TCE0_CTRLB &= ~0x80

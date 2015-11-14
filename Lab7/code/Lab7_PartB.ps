@@ -1,0 +1,44 @@
+def main():
+    init()
+    init_speaker()
+    init_keypad()
+    init_lcd()
+    while True:
+        sleep()
+        lcd_clear()
+        switch last_key:
+            case 1:
+                lcd_write("C6\n1046.50 Hz")
+            case 2:
+                lcd_write("C6S\n1108.73 Hz")
+            case 3:
+                lcd_write("D6\n 1174.66 Hz")
+            case 4:
+                lcd_write("D6S\n1244.51 Hz")
+            case 5:
+                lcd_write("E6\n 1318.51 Hz")
+            case 6:
+                lcd_write("F6\n 1396.91 Hz")
+            case 7:
+                lcd_write("F6S\n1479.98 Hz")
+            case 8:
+                lcd_write("G6\n 1567.98 Hz")
+            case 9:
+                lcd_write("G6S\n1661.22 Hz")
+            case 0:
+                lcd_write("A6\n 1760.00 Hz")
+            case A:
+                lcd_write("A6S\n1864.66 Hz")
+            case B:
+                lcd_write("B6\n 1975.53 Hz")
+            case C:
+                lcd_write("C7\n 2093.00 Hz")
+            case D:
+                lcd_write("C7S\n2217.46 Hz")
+            case *:
+                lcd_write("Game of Thrones")
+                game_of_thrones() # Omitted, look at code
+            case #:
+                lcd_write("Pokemon Route #1")
+                pokemon() # Omitted, look at code
+
